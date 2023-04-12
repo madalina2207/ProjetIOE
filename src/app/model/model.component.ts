@@ -40,9 +40,9 @@ export class ModelComponent implements OnInit {
     this.engine.enableOfflineSupport = false
     const scene = new Scene(this.engine)
     //gauche, hateur, rapproche
-    const camera = new FreeCamera("camera", new Vector3(10,20,-40), this.scene)
+    const camera = new FreeCamera("camera", new Vector3(80,20,-20), this.scene)
     camera.attachControl()
-    camera.speed = 0.25
+    camera.speed = 0.5
 
     const envTex = CubeTexture.CreateFromPrefilteredData("../../assets/env/sky.env",scene)
     scene.environmentTexture = envTex
@@ -88,25 +88,24 @@ async CreateVillage(){
   // Changement de la dimension du cube en multipliant sa taille par un facteur de mise à l'échelle
   //1er objet
   const batiment1 = meshes[0]
-  batiment1.position = new Vector3(1,2,40)
+  batiment1.position = new Vector3(9.2,7,55)
   batiment1.scaling = new Vector3(0.5,0.5,0.5) //dimension de l'objet
-  batiment1.addRotation(0,60,0)
+  batiment1.addRotation(0,59.7,0)
   //2eme objet
   const batiment2=batiment1.clone("batiment2",null,);
   if(batiment2 != null)
   {
-    batiment2.position = new Vector3(90,-15,60);
-    batiment2.scaling = new Vector3(1,1,1)
-    batiment2.addRotation(0,0.8,0);
-
+    batiment2.position = new Vector3(98,7,55);
+    // batiment2.scaling = new Vector3(1,1,1)
+    // batiment2.addRotation(0,0,0);
   }
   // 3eme objet
   const batiment3=batiment1.clone("batiment3",null,);
   if(batiment3 != null)
   {
-    batiment3.position = new Vector3(-90,-10,30);
-    batiment3.scaling = new Vector3(1,1,1)
-    batiment3.addRotation(0,-0.8,0);
+    batiment3.position = new Vector3(53.5,7,55);
+    // batiment3.scaling = new Vector3(1,1,1)
+    // batiment3.addRotation(0,-0.8,0);
   }
   console.log("meshes",meshes);
 }
@@ -117,9 +116,9 @@ async CreateCommbatant(scene :Scene){
   console.log(animationGroups)
   console.log(skeletons)
   animationGroups[0].stop()
-  const hero = meshes[0]
-  hero.position = new Vector3(11,8.2,20)
-  hero.addRotation(0,22,0)
+  const hero1 = meshes[0]
+  hero1.position = new Vector3(75,15,30)
+  hero1.addRotation(0,22,0)
   // hero.scaling.scaleInPlace(0.5)
 
   const skeleton = skeletons[0]
@@ -144,22 +143,22 @@ async CreateCommbatant(scene :Scene){
   scene.onBeforeRenderObservable.add(() => {
     var keydown = false
     if(inputMap["z"]){
-      hero.moveWithCollisions(hero.forward.scaleInPlace(speed))
+      hero1.moveWithCollisions(hero1.forward.scaleInPlace(speed))
       keydown = true
     }
 
     if(inputMap["s"]){
-      hero.moveWithCollisions(hero.forward.scaleInPlace(-speed))
+      hero1.moveWithCollisions(hero1.forward.scaleInPlace(-speed))
       keydown = true
     }
 
     if(inputMap["a"]){
-      hero.rotate(Vector3.Up(),-0.1)
+      hero1.rotate(Vector3.Up(),-0.1)
       keydown = true
     }
 
     if(inputMap["d"]){
-      hero.rotate(Vector3.Up(),0.1)
+      hero1.rotate(Vector3.Up(),0.1)
       keydown = true
     }
     if(inputMap["f"]){
