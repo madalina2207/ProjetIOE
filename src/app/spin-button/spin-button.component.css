@@ -12,10 +12,14 @@ body{
 	height:100vh;
 	overflow:hidden;
 }
+.principal{
+	width:400px;
+	height:400px;
+}
 
 .container{
-	width:500px;
-	height:500px;
+	width:400px;
+	height:400px;
 	background-color: #ccc;
 	border-radius:50%;
 	border:15px solid #dde;
@@ -28,7 +32,7 @@ body{
 	height:50%;
 	width:200px;
 	position: absolute;
-	clip-path: polygon(100% 0 , 50% 100% , 0 0 );
+	clip-path: polygon(79% 0 , 50% 100% , 0 0 );
 	transform:translateX(-50%);
 	transform-origin:bottom;
 	text-align:center;
@@ -39,7 +43,9 @@ body{
 	font-weight:bold;
 	font-family:sans-serif;
 	color:#fff;
-	left:135px;
+	left:85px;
+	writing-mode: vertical-rl;
+    text-orientation: mixed;
 }
 
 .container .one{
@@ -76,8 +82,8 @@ body{
 }
 
 #spin{
-	position: absolute;
-	top:50%;
+	position: relative;
+	top:69%;
 	left:50%;
 	transform:translate(-50%,-50%);
 	z-index:10;
@@ -94,4 +100,11 @@ body{
 	cursor: pointer;
 	outline:none;
 	letter-spacing: 1px;
+}
+.arrow{
+	position: absolute;
+	top:50%;
+	left:50%;
+	transform: translateX(-50%);
+	color:#000000;
 }
