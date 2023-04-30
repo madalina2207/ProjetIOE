@@ -6,6 +6,8 @@ import { Scene3DComponent } from './scene3-d/scene3-d.component';
 import { ModelComponent } from './model/model.component';
 import { Model2Component } from './model2/model2.component';
 import { DialogboxComponent } from './dialogbox/dialogbox.component';
+import { AccueilComponent } from './accueil/accueil.component';
+import { PlayStarterComponent } from './play-starter/play-starter.component';
 
 @NgModule({
   declarations: [
@@ -13,7 +15,9 @@ import { DialogboxComponent } from './dialogbox/dialogbox.component';
     Scene3DComponent,
     ModelComponent,
     Model2Component,
-    DialogboxComponent
+    DialogboxComponent,
+    AccueilComponent,
+    PlayStarterComponent
   ],
   imports: [
     BrowserModule

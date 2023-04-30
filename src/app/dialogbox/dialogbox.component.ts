@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, OnInit } from '@angular/core';
 
-//import { Engine } from '@babylonjs/core';
+//mport { Engine } from '@babylonjs/core';
 //import { BabylonjsComponent } from 'angular-babylonjs';
 
 @Component({
