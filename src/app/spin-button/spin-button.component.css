@@ -50,35 +50,36 @@ body{
 
 .container .one{
 	background-color: #f41b1b;
-	left:50%;
+	transform: rotate(-18deg);
+
 }
 .container .two{
 	background-color: #e6a53d;
-	transform: rotate(45deg);
+	transform: rotate(27deg);
 }
 .container .three{
 	background-color: #e2ec2e;
-	transform:rotate(90deg);
+	transform:rotate(72deg);
 }
 .container .four{
 	background-color: #22e549;
-	transform: rotate(135deg);
+	transform: rotate(117deg);
 }
 .container .five{
 	background-color: #1ed7f0;
-	transform: rotate(180deg);
+	transform: rotate(162deg);
 }
 .container .six{
 	background-color: #2d37ea;
-	transform: rotate(225deg);
+	transform: rotate(207deg);
 }
 .container .seven{
 	background-color: #a315ce;
-	transform: rotate(270deg);
+	transform: rotate(252deg);
 }
 .container .eight{
 	background-color: #e872c4;
-	transform: rotate(315deg);
+	transform: rotate(297deg);
 }
 
 #spin{
@@ -101,10 +102,13 @@ body{
 	outline:none;
 	letter-spacing: 1px;
 }
-.arrow{
+#spin::before{
+	content: '';
 	position: absolute;
-	top:50%;
-	left:50%;
-	transform: translateX(-50%);
-	color:#000000;
-}
+	left: 25%;
+	top: -35px;
+	width: 30px;
+	height: 30px;
+	background: #fff;
+	clip-path: polygon(50% 0%, 15% 100%, 85% 100%);
+  }
