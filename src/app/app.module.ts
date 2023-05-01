@@ -8,6 +8,8 @@ import { Model2Component } from './model2/model2.component';
 import { DialogboxComponent } from './dialogbox/dialogbox.component';
 import { AccueilComponent } from './accueil/accueil.component';
 import { PlayStarterComponent } from './play-starter/play-starter.component';
+import { RulesComponent } from './rules/rules.component';
+import { AppRoutingModule } from './app.routing.module';
 
 @NgModule({
   declarations: [
@@ -17,10 +19,12 @@ import { PlayStarterComponent } from './play-starter/play-starter.component';
     Model2Component,
     DialogboxComponent,
     AccueilComponent,
-    PlayStarterComponent
+    PlayStarterComponent,
+    RulesComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
