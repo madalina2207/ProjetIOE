@@ -1,4 +1,9 @@
 import { Component } from '@angular/core';
+import { ApiQuizzable } from '../ApiQuizzable.service';
+import { categorie } from '../categorie';
+import { reponse } from '../reponse';
+import { reponsescorrectes } from '../reponsescorrectes';
+import { question } from '../question';
 
 @Component({
   selector: 'app-dialogbox',
@@ -15,7 +20,15 @@ export class DialogboxComponent {
   player2Choices = 0; // Nombre de choix pour joueur 2
   number: number = 0;
 
-  constructor() {
+  listeCategorie: categorie []= [];
+  listeQuestions: question []= [];
+  listeReponses: reponse []= [];
+  listeRepCorrectes: reponsescorrectes []= [];
+
+  texteCat !: String;
+  lQuestxCat : question[]  = [];
+
+  constructor(private apiQuizz: ApiQuizzable) {
     // Ecouter les touches pressées par les joueurs
     document.addEventListener('keydown', event => {
       const key = event.key.toLowerCase();
@@ -33,6 +46,15 @@ export class DialogboxComponent {
     });
   }
 
+  ngOnInit(): void{
+    this.apiQuizz.getListeCat().subscribe((data: categorie[]) => {this.listeCategorie=data;});
+    this.apiQuizz.getListeQuestion().subscribe((data: question[]) => {this.listeQuestions=data;});
+    this.apiQuizz.getListeReponse().subscribe((data: reponse[]) => {this.listeReponses=data;});
+    this.apiQuizz.getListeRepCorrecte().subscribe((data: reponsescorrectes[]) => {this.listeRepCorrectes=data;});
+  }
+
+  
+
   spin() {
     this.number += 100 + Math.ceil(Math.random() * 1000);
     const container = document.querySelector(".container") as HTMLElement;
@@ -43,21 +65,45 @@ export class DialogboxComponent {
 
     if (deg >= 0 && deg <= 45) {
       console.log("Air");
+      this.texteCat="Air";
     } else if (deg > 45 && deg <= 90) {
       console.log("Cat. nat");
+      this.texteCat="Catastrophes naturelles";
     } else if (deg > 90 && deg <= 135) {
-      console.log("Res. nat");
+      console.log("Res. nat")
+      this.texteCat="Ressources naturelles";
     } else if (deg > 135 && deg <= 180) {
       console.log("Eau");
+      this.texteCat="Eau";
     } else if (deg > 180 && deg <= 225) {
       console.log("Pollution");
+      this.texteCat="Pollution";
     } else if (deg > 225 && deg <= 270) {
       console.log("Biologie");
+      this.texteCat="Biologie";
     } else if (deg > 270 && deg <= 315) {
       console.log("Dechets");
+      this.texteCat="Dechets";
     } else if ((deg > 315 && deg < 360)||(deg=0)) {
       console.log("Climat");
+      this.texteCat="Climat";
     }
+  }
+
+  selectionQuestion() : question[]{
+    let i=0;
+    let ok= true;
+    
+
+    while(ok){
+      if (this.listeCategorie[i].nomCat== this.texteCat){
+        ok=false;
+        this.lQuestxCat=this.listeCategorie[i].question;
+      }
+    }
+    console.log(this.lQuestxCat)
+    return this.lQuestxCat;
+      
   }
 
   checkAnswer(player: number, key: string) {
