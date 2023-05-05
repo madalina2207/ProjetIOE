@@ -33,7 +33,7 @@ export class ApiQuizzable{
     }
 
     public getReponse(idr :String):Observable<reponse>{
-        return this.http.get<reponse>(`${this.url}/categorie`+idr);
+        return this.http.get<reponse>(`${this.url}/reponse`+idr);
     }
 
     public getListeReponse():Observable<reponse[]>{
@@ -41,11 +41,11 @@ export class ApiQuizzable{
     }
 
     public getRepCorrecte(idrc :String) :Observable<reponsescorrectes>{
-        return this.http.get<reponsescorrectes>(`${this.url}/categorie`+idrc);
+        return this.http.get<reponsescorrectes>(`${this.url}/reponsecorrecte`+idrc);
     }
 
     public getListeRepCorrecte() :Observable<reponsescorrectes[]>{
-        return this.http.get<reponsescorrectes[]>(`${this.url}/categorie`);
+        return this.http.get<reponsescorrectes[]>(`${this.url}/listeRC`);
     }
 
 }

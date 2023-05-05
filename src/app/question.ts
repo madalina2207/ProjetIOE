@@ -1,4 +1,4 @@
 export class question{
-    idq!: String;
+    idQ!: String;
     question!: String;
 }

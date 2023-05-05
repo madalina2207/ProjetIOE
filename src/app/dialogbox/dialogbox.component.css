@@ -178,6 +178,7 @@ body{
     font-size: 22px;
     font-weight: 500;
     border-radius: 30px;
+	visibility: hidden;
 }
 .row{
     display: flex;
@@ -190,6 +191,7 @@ body{
     flex: 1;
     background: #fff;
     text-align: center;
+	
 }
 .col h2 {
     font-size: 38px;
