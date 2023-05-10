@@ -4,9 +4,9 @@ import { ActionManager } from '@babylonjs/core/Actions/actionManager';
 import { FreeCamera } from '@babylonjs/core/Cameras';
 import { KeyboardEventTypes } from '@babylonjs/core/Events/keyboardEvents';
 import { HemisphericLight } from '@babylonjs/core/Lights';
-import { CubeTexture, PBRMaterial, Texture } from '@babylonjs/core/Materials';
-import { Vector3 } from '@babylonjs/core/Maths';
-import { MeshBuilder } from '@babylonjs/core/Meshes';
+import { CubeTexture, PBRMaterial, StandardMaterial, Texture } from '@babylonjs/core/Materials';
+import { Color3, Vector3 } from '@babylonjs/core/Maths';
+import { Mesh, MeshBuilder } from '@babylonjs/core/Meshes';
 import "@babylonjs/loaders/glTF";
 
 
@@ -20,37 +20,66 @@ export class ModelComponent implements OnInit {
   scene!:Scene
   engine!:Engine
   animating = true
+  octahedron !: Mesh;
   constructor() { }
 
  async ngOnInit(): Promise<void> {
     const canva = document.querySelector('canvas')!
     this.engine = new Engine(canva, true)
     this.scene = await this.CreateScene()
-    // this.CreateGroud()
-    this.CreateVillage()
+    this.CreateGroud()
+    this.CreatePlayStarter(this.scene)
     //this.CreateBarrel()
    // this.CreateCommbatant()
 
     this.engine.runRenderLoop(() => {
       this.scene.render()
+      this.octahedron.rotation.y += 0.01;
     })
   }
 
   async CreateScene() : Promise<Scene>{
     this.engine.enableOfflineSupport = false
     const scene = new Scene(this.engine)
-    //gauche, hateur, rapproche
-    const camera = new FreeCamera("camera", new Vector3(10,20,-40), this.scene)
+    const camera = new FreeCamera("camera", new Vector3(0,0.75,-2), this.scene)
     camera.attachControl()
     camera.speed = 0.25
 
     const envTex = CubeTexture.CreateFromPrefilteredData("../../assets/env/sky.env",scene)
     scene.environmentTexture = envTex
-    // scene.createDefaultSkybox(envTex, true)
+    scene.createDefaultSkybox(envTex, true)
     scene.environmentIntensity = 1
     const s = this.CreateCommbatant(scene)
-    const sc = await s
+    //const o = this.CreatePlayStarter(scene)
+    //const s2 = this.CreateCommbatant(scene)
+    const sc = await s;
+    //sc= await s2;
     return sc
+  }
+
+  CreatePlayStarter(scene : Scene) : Scene{
+    //let octahedron: Mesh;
+    
+    this.octahedron = MeshBuilder.CreatePolyhedron(
+      'octahedron',
+      { type: 1, size: 0.14},
+      this.scene
+    );
+    this.octahedron.setPositionWithLocalVector(new Vector3(1.0, 0.2, 1.0));
+    
+    let material = new PBRMaterial("material", scene);
+    //material.albedoColor = new Color3(0.5, 1, 0.5); // red color
+    material.metallic = 0.8; // partially reflective
+    material.roughness = 0.5; // partially shiny
+
+    var redMat = new StandardMaterial("material", scene);
+	  redMat.diffuseTexture = new Texture("assets/textures/painted_concrete_diff_4k.jpg", this.scene);
+    this.octahedron.material = redMat;
+
+    let light = new HemisphericLight("light", new Vector3(0, 1, -1), this.scene);
+	  light.specular = new Color3(0, 0.5, 0);
+	
+    return scene
   }
 
  CreateGroud(){
@@ -82,34 +111,6 @@ export class ModelComponent implements OnInit {
   console.log("meshes",meshes)
 }
 
-async CreateVillage(){
-  // Création des bâtiments
-  const {meshes} = await SceneLoader.ImportMeshAsync('','../../assets/models/','batiment.glb')
-  // Changement de la dimension du cube en multipliant sa taille par un facteur de mise à l'échelle
-  //1er objet
-  const batiment1 = meshes[0]
-  batiment1.position = new Vector3(1,2,40)
-  batiment1.scaling = new Vector3(0.5,0.5,0.5) //dimension de l'objet
-  batiment1.addRotation(0,60,0)
-  //2eme objet
-  const batiment2=batiment1.clone("batiment2",null,);
-  if(batiment2 != null)
-  {
-    batiment2.position = new Vector3(90,-15,60);
-    batiment2.scaling = new Vector3(1,1,1)
-    batiment2.addRotation(0,0.8,0);
-
-  }
-  // 3eme objet
-  const batiment3=batiment1.clone("batiment3",null,);
-  if(batiment3 != null)
-  {
-    batiment3.position = new Vector3(-90,-10,30);
-    batiment3.scaling = new Vector3(1,1,1)
-    batiment3.addRotation(0,-0.8,0);
-  }
-  console.log("meshes",meshes);
-}
 
 async CreateCommbatant(scene :Scene){
   const {meshes,animationGroups,skeletons} = await SceneLoader.ImportMeshAsync('','../../assets/models/','combattant5.glb',scene)
@@ -118,9 +119,8 @@ async CreateCommbatant(scene :Scene){
   console.log(skeletons)
   animationGroups[0].stop()
   const hero = meshes[0]
-  hero.position = new Vector3(11,8.2,20)
-  hero.addRotation(0,22,0)
-  // hero.scaling.scaleInPlace(0.5)
+  hero.scaling.scaleInPlace(0.5)
+  
 
   const skeleton = skeletons[0]
   const speed = 0.03
@@ -167,7 +167,6 @@ async CreateCommbatant(scene :Scene){
     }
 
 
-
     if(keydown){
       console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
       if(!this.animating){
@@ -189,8 +188,10 @@ async CreateCommbatant(scene :Scene){
         this.animating = false
       }
     }
+    
 
   })
+
 
   return scene;
 }
