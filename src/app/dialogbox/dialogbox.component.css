@@ -120,7 +120,7 @@ body{
 }
 body{
     margin:0;
-    font-family: cursive;
+    font-family: 'Josefine sans';
     font-size: 20px;
     color: #000000;
     line-height:1.6;
@@ -178,7 +178,6 @@ body{
     font-size: 22px;
     font-weight: 500;
     border-radius: 30px;
-	visibility: hidden;
 }
 .row{
     display: flex;
@@ -210,4 +209,55 @@ body{
     border-radius: 4px;
     cursor: pointer;
     box-shadow: 0 5px 5px rgba(0,0,0.2);
+}
+#countdown {
+	font-size: 50px;
+	font-weight: bold;
+	color: #fe0000;
+    font-family: 'Josefine sans', serif;
+    font-size: 28px;
+    display: flex;
+    
+  }
+h5 {
+    font-family: 'Josefine sans',serif;
+    font-weight: bold;
+    font-size: 38px;
+    text-shadow: 4px 4px 4px #aaa;
+}
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
 }
