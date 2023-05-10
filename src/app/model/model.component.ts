@@ -30,7 +30,6 @@ export class ModelComponent implements OnInit {
     this.CreateGroud()
     this.CreatePlayStarter(this.scene)
     //this.CreateBarrel()
-   // this.CreateCommbatant()
 
     this.engine.runRenderLoop(() => {
       this.scene.render()
@@ -50,9 +49,10 @@ export class ModelComponent implements OnInit {
     scene.createDefaultSkybox(envTex, true)
     scene.environmentIntensity = 1
     const s = this.CreateCommbatant(scene)
+    const s2 = this.CreateCommbatant2(scene)
     //const o = this.CreatePlayStarter(scene)
-    //const s2 = this.CreateCommbatant(scene)
-    const sc = await s;
+    let sc = await s;
+    sc = await s2;
     //sc= await s2;
     return sc
   }
@@ -168,7 +168,7 @@ async CreateCommbatant(scene :Scene){
 
 
     if(keydown){
-      console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+      console.log("xxxxxxxxxxxxxxxxxxxx")
       if(!this.animating){
           this.animating = true
           if(inputMap["z"]){
@@ -192,7 +192,90 @@ async CreateCommbatant(scene :Scene){
 
   })
 
+  return scene;
+}
+
+async CreateCommbatant2(scene :Scene){
+  const {meshes,animationGroups,skeletons} = await SceneLoader.ImportMeshAsync('','../../assets/models/','combattant5.glb',scene)
+  console.log("meshes",meshes)
+  console.log(animationGroups)
+  console.log(skeletons)
+  animationGroups[0].stop()
+  const hero2 = meshes[0]
+  hero2.scaling.scaleInPlace(0.5)
+  
+
+  const skeleton = skeletons[0]
+  const speed = 0.03
+
+  const walk =   scene.getAnimationGroupByName("walk")
+  const doubleAttack2 = scene.getAnimationGroupByName("doubleAttack")
+  const attackSimple = scene.getAnimationGroupByName('Armature|mixamo.com|Layer0')
+  const walking = scene.getAnimationGroupByName("walking")
+
+  const inputMap:any = {}
+  scene.actionManager = new ActionManager(scene)
+  scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger,function (evt) {
+    inputMap[evt.sourceEvent.key] = evt.sourceEvent.type =="keydown"
+  }))
+  scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger,function(evt){
+    inputMap[evt.sourceEvent.key] =  evt.sourceEvent.type =="keydown"
+  }))
+
+
+
+  scene.onBeforeRenderObservable.add(() => {
+    var keydown = false
+    if(inputMap["w"]){
+      hero2.moveWithCollisions(hero2.forward.scaleInPlace(speed))
+      keydown = true
+    }
+
+    if(inputMap["x"]){
+      hero2.moveWithCollisions(hero2.forward.scaleInPlace(-speed))
+      keydown = true
+    }
+
+    if(inputMap["c"]){
+      hero2.rotate(Vector3.Up(),-0.1)
+      keydown = true
+    }
+
+    if(inputMap["v"]){
+      hero2.rotate(Vector3.Up(),0.1)
+      keydown = true
+    }
+    if(inputMap["b"]){
+      doubleAttack2?.start(false,1.0,doubleAttack2?.from,doubleAttack2.to,false)
+    }
+
+
+    if(keydown){
+      console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+      if(!this.animating){
+          this.animating = true
+          if(inputMap["w"]){
+            walking?.start(true,1.0,walking.from,walking.to,false)
+          }
+
+      }
+    }
+    else{
+      if(this.animating){
+        const defaultAnim = animationGroups[5]
+        defaultAnim.start(true,1.0,defaultAnim.from, defaultAnim.to,false)
+        walk?.stop()
+        walking?.stop()
+        doubleAttack2?.stop()
+        attackSimple?.stop()
+        this.animating = false
+      }
+    }
+    
+
+  })
 
   return scene;
 }
+
 }
