@@ -4,3 +4,19 @@ canvas{
   position: relative;
   bottom: 0;
 }
+divgauche{
+  border: 2px solid black;
+  border-radius: 4px;
+  position: absolute; 
+  top: 10%; 
+  left: 10%; 
+  background-color: white;
+}
+divdroit{
+  border: 2px solid black;
+  border-radius: 4px;
+  position: absolute; 
+  top: 10%; 
+  right: 10%; 
+  background-color: white;
+}

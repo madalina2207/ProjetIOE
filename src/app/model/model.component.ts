@@ -1,13 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { Scene,Engine, SceneLoader, ExecuteCodeAction } from '@babylonjs/core';
+import { Scene,Engine, SceneLoader, ExecuteCodeAction, float, BoundingBox, BoundingBoxRenderer } from '@babylonjs/core';
 import { ActionManager } from '@babylonjs/core/Actions/actionManager';
 import { FreeCamera } from '@babylonjs/core/Cameras';
 import { KeyboardEventTypes } from '@babylonjs/core/Events/keyboardEvents';
 import { HemisphericLight } from '@babylonjs/core/Lights';
 import { CubeTexture, PBRMaterial, StandardMaterial, Texture } from '@babylonjs/core/Materials';
 import { Color3, Vector3 } from '@babylonjs/core/Maths';
-import { Mesh, MeshBuilder } from '@babylonjs/core/Meshes';
+import { AbstractMesh, Mesh, MeshBuilder } from '@babylonjs/core/Meshes';
 import "@babylonjs/loaders/glTF";
+import { DynamicTexture, Plane} from '@babylonjs/core';
+
+// ...
+
 
 
 @Component({
@@ -20,7 +24,14 @@ export class ModelComponent implements OnInit {
   scene!:Scene
   engine!:Engine
   animating = true
-  octahedron !: Mesh;
+  octahedron1 !: Mesh;
+  octahedron2 !: Mesh;
+  octahedron3 !: Mesh;
+  octahedron4 !: Mesh;
+  octahedron5 !: Mesh;
+  hero !: Mesh;
+  target: any;
+  box: any;
   constructor() { }
 
  async ngOnInit(): Promise<void> {
@@ -28,44 +39,71 @@ export class ModelComponent implements OnInit {
     this.engine = new Engine(canva, true)
     this.scene = await this.CreateScene()
     this.CreateGroud()
-    this.CreatePlayStarter(this.scene)
-    //this.CreateBarrel()
+    this.CreatePlayStarter(this.scene, 1.0, 0.35, 0)
+    this.CreatePlayStarter2(this.scene, 1.8, 0.35, 1)
+    this.CreatePlayStarter3(this.scene, 2.6, 0.35, 0)
+    this.CreatePlayStarter4(this.scene, 4.0, 0.35, 1)
+    this.CreatePlayStarter5(this.scene, 4.5, 0.35, 0)
 
-    this.engine.runRenderLoop(() => {
-      this.scene.render()
-      this.octahedron.rotation.y += 0.01;
-    })
-  }
+};
 
+CreateBox(texte:any) : Mesh{
+  const box = MeshBuilder.CreateBox('box', { size: 0.3 }, this.scene);
+  
+  const material = new StandardMaterial('material', this.scene);
+  material.diffuseColor = new Color3(0.5, 0.5, 1);
+  box.material = material;
+  
+  // Create a dynamic texture for the text box
+  const dynamicTexture = new DynamicTexture('dynamicTexture', { width: 490, height: 240 }, this.scene);
+  
+  // Apply the dynamic texture to the plane
+  material.diffuseTexture = dynamicTexture;
+  
+  // Create a text box
+  const text = texte;
+  const font = 'bold 60px Arial';
+  const color = 'white';
+  dynamicTexture.drawText(text, 20, 80, font, color, 'transparent', true);
+  return box;
+}
   async CreateScene() : Promise<Scene>{
     this.engine.enableOfflineSupport = false
     const scene = new Scene(this.engine)
-    const camera = new FreeCamera("camera", new Vector3(0,0.75,-2), this.scene)
+    const camera = new FreeCamera("camera", new Vector3(2.2,0.75,-3.2), this.scene)
+
     camera.attachControl()
     camera.speed = 0.25
+    
+    this.CreateBox('Niveau 1').setPositionWithLocalVector(new Vector3(1,-0.01,0));
+    this.CreateBox('Niveau 2').setPositionWithLocalVector(new Vector3(1.8,0,1)); 
+    this.CreateBox('Niveau 3').setPositionWithLocalVector(new Vector3(2.6,-0.01,0));
+    this.CreateBox('Niveau 4').setPositionWithLocalVector(new Vector3(4.0,0,1)); 
+    this.CreateBox('Niveau 5').setPositionWithLocalVector(new Vector3(4.5,-0.01,0));
 
     const envTex = CubeTexture.CreateFromPrefilteredData("../../assets/env/sky.env",scene)
     scene.environmentTexture = envTex
     scene.createDefaultSkybox(envTex, true)
     scene.environmentIntensity = 1
     const s = this.CreateCommbatant(scene)
-    const s2 = this.CreateCommbatant2(scene)
+
+    // const s2 = this.CreateCommbatant2(scene)
     //const o = this.CreatePlayStarter(scene)
-    let sc = await s;
-    sc = await s2;
+    const sc = await s;
+    // sc = await s2;
     //sc= await s2;
     return sc
   }
 
-  CreatePlayStarter(scene : Scene) : Scene{
+  CreatePlayStarter(scene : Scene, pos1: float, pos2: float, pos3:float) : Scene{
     //let octahedron: Mesh;
     
-    this.octahedron = MeshBuilder.CreatePolyhedron(
+    this.octahedron1 = MeshBuilder.CreatePolyhedron(
       'octahedron',
       { type: 1, size: 0.14},
       this.scene
     );
-    this.octahedron.setPositionWithLocalVector(new Vector3(1.0, 0.2, 1.0));
+    this.octahedron1.setPositionWithLocalVector(new Vector3(pos1, pos2, pos3));
     
     let material = new PBRMaterial("material", scene);
     //material.albedoColor = new Color3(0.5, 1, 0.5); // red color
@@ -74,10 +112,137 @@ export class ModelComponent implements OnInit {
 
     var redMat = new StandardMaterial("material", scene);
 	  redMat.diffuseTexture = new Texture("assets/textures/painted_concrete_diff_4k.jpg", this.scene);
-    this.octahedron.material = redMat;
+    this.octahedron1.material = redMat;
 
     let light = new HemisphericLight("light", new Vector3(0, 1, -1), this.scene);
 	  light.specular = new Color3(0, 0.5, 0);
+
+    this.engine.runRenderLoop(() => {
+      this.scene.render()
+      this.octahedron1.rotation.y += 0.01;
+    })
+
+	
+    return scene
+  }
+
+  CreatePlayStarter2(scene : Scene, pos1: float, pos2: float, pos3:float) : Scene{
+    //let octahedron: Mesh;
+    
+    this.octahedron2 = MeshBuilder.CreatePolyhedron(
+      'octahedron',
+      { type: 1, size: 0.14},
+      this.scene
+    );
+    this.octahedron2.setPositionWithLocalVector(new Vector3(pos1, pos2, pos3));
+    
+    let material = new PBRMaterial("material", scene);
+    //material.albedoColor = new Color3(0.5, 1, 0.5); // red color
+    material.metallic = 0.8; // partially reflective
+    material.roughness = 0.5; // partially shiny
+
+    var redMat = new StandardMaterial("material", scene);
+	  redMat.diffuseTexture = new Texture("assets/textures/painted_concrete_diff_4k.jpg", this.scene);
+    this.octahedron2.material = redMat;
+
+    let light = new HemisphericLight("light", new Vector3(0, 1, -1), this.scene);
+	  light.specular = new Color3(0, 0.5, 0);
+
+    this.engine.runRenderLoop(() => {
+      this.scene.render()
+      this.octahedron2.rotation.y += 0.01;
+    })
+	
+    return scene
+  }
+
+  CreatePlayStarter3(scene : Scene, pos1: float, pos2: float, pos3:float) : Scene{
+    //let octahedron: Mesh;
+    
+    this.octahedron3 = MeshBuilder.CreatePolyhedron(
+      'octahedron',
+      { type: 1, size: 0.14},
+      this.scene
+    );
+    this.octahedron3.setPositionWithLocalVector(new Vector3(pos1, pos2, pos3));
+    
+    let material = new PBRMaterial("material", scene);
+    //material.albedoColor = new Color3(0.5, 1, 0.5); // red color
+    material.metallic = 0.8; // partially reflective
+    material.roughness = 0.5; // partially shiny
+
+    var redMat = new StandardMaterial("material", scene);
+	  redMat.diffuseTexture = new Texture("assets/textures/painted_concrete_diff_4k.jpg", this.scene);
+    this.octahedron3.material = redMat;
+
+    let light = new HemisphericLight("light", new Vector3(0, 1, -1), this.scene);
+	  light.specular = new Color3(0, 0.5, 0);
+
+    this.engine.runRenderLoop(() => {
+      this.scene.render()
+      this.octahedron3.rotation.y += 0.01;
+    })
+
+
+    return scene
+  }
+
+  CreatePlayStarter4(scene : Scene, pos1: float, pos2: float, pos3:float) : Scene{
+    //let octahedron: Mesh;
+    
+    this.octahedron4 = MeshBuilder.CreatePolyhedron(
+      'octahedron',
+      { type: 1, size: 0.14},
+      this.scene
+    );
+    this.octahedron4.setPositionWithLocalVector(new Vector3(pos1, pos2, pos3));
+    
+    let material = new PBRMaterial("material", scene);
+    //material.albedoColor = new Color3(0.5, 1, 0.5); // red color
+    material.metallic = 0.8; // partially reflective
+    material.roughness = 0.5; // partially shiny
+
+    var redMat = new StandardMaterial("material", scene);
+	  redMat.diffuseTexture = new Texture("assets/textures/painted_concrete_diff_4k.jpg", this.scene);
+    this.octahedron4.material = redMat;
+
+    let light = new HemisphericLight("light", new Vector3(0, 1, -1), this.scene);
+	  light.specular = new Color3(0, 0.5, 0);
+
+    this.engine.runRenderLoop(() => {
+      this.scene.render()
+      this.octahedron4.rotation.y += 0.01;
+    })
+	
+    return scene
+  }
+
+  CreatePlayStarter5(scene : Scene, pos1: float, pos2: float, pos3:float) : Scene{
+    //let octahedron: Mesh;
+    
+    this.octahedron5 = MeshBuilder.CreatePolyhedron(
+      'octahedron',
+      { type: 1, size: 0.14},
+      this.scene
+    );
+    this.octahedron5.setPositionWithLocalVector(new Vector3(pos1, pos2, pos3));
+    
+    let material = new PBRMaterial("material", scene);
+    //material.albedoColor = new Color3(0.5, 1, 0.5); // red color
+    material.metallic = 0.8; // partially reflective
+    material.roughness = 0.5; // partially shiny
+
+    var redMat = new StandardMaterial("material", scene);
+	  redMat.diffuseTexture = new Texture("assets/textures/painted_concrete_diff_4k.jpg", this.scene);
+    this.octahedron5.material = redMat;
+
+    let light = new HemisphericLight("light", new Vector3(0, 1, -1), this.scene);
+	  light.specular = new Color3(0, 0.5, 0);
+
+    this.engine.runRenderLoop(() => {
+      this.scene.render()
+      this.octahedron5.rotation.y += 0.01;
+    })
 	
     return scene
   }
@@ -111,6 +276,32 @@ export class ModelComponent implements OnInit {
   console.log("meshes",meshes)
 }
 
+intersectsBox(box1: BoundingBox, box2: BoundingBox): boolean {
+  // Check for intersection along the x-axis
+  if (box1.maximum.x < box2.minimum.x || box1.minimum.x > box2.maximum.x) {
+    return false; // No intersection
+  }
+
+  // Check for intersection along the y-axis
+  if (box1.maximum.y < box2.minimum.y || box1.minimum.y > box2.maximum.y) {
+    return false; // No intersection
+  }
+
+  // Check for intersection along the z-axis
+  if (box1.maximum.z < box2.minimum.z || box1.minimum.z > box2.maximum.z) {
+    return false; // No intersection
+  }
+
+  // If there's no separation along any axis, the boxes intersect
+  return true;
+}
+
+doMeshesCollide = (mesh1: Mesh, mesh2: Mesh): boolean => {
+  const boundingBox1 = mesh1.getBoundingInfo().boundingBox;
+  const boundingBox2 = mesh2.getBoundingInfo().boundingBox;
+
+  return this.intersectsBox(boundingBox1, boundingBox2);
+};
 
 async CreateCommbatant(scene :Scene){
   const {meshes,animationGroups,skeletons} = await SceneLoader.ImportMeshAsync('','../../assets/models/','combattant5.glb',scene)
@@ -123,12 +314,13 @@ async CreateCommbatant(scene :Scene){
   
 
   const skeleton = skeletons[0]
-  const speed = 0.03
+  const speed = 0.01
 
   const walk =   scene.getAnimationGroupByName("walk")
   const doubleAttack = scene.getAnimationGroupByName("doubleAttack")
   const attackSimple = scene.getAnimationGroupByName('Armature|mixamo.com|Layer0')
   const walking = scene.getAnimationGroupByName("walking")
+
 
   const inputMap:any = {}
   scene.actionManager = new ActionManager(scene)
@@ -140,29 +332,28 @@ async CreateCommbatant(scene :Scene){
   }))
 
 
-
   scene.onBeforeRenderObservable.add(() => {
     var keydown = false
-    if(inputMap["z"]){
+    if(inputMap["s"]){
       hero.moveWithCollisions(hero.forward.scaleInPlace(speed))
       keydown = true
     }
 
-    if(inputMap["s"]){
+    if(inputMap["x"]){
       hero.moveWithCollisions(hero.forward.scaleInPlace(-speed))
       keydown = true
     }
 
-    if(inputMap["a"]){
+    if(inputMap["w"]){
       hero.rotate(Vector3.Up(),-0.1)
       keydown = true
     }
 
-    if(inputMap["d"]){
+    if(inputMap["c"]){
       hero.rotate(Vector3.Up(),0.1)
       keydown = true
     }
-    if(inputMap["f"]){
+    if(inputMap["d"]){
       doubleAttack?.start(false,1.0,doubleAttack?.from,doubleAttack.to,false)
     }
 
@@ -171,7 +362,7 @@ async CreateCommbatant(scene :Scene){
       console.log("xxxxxxxxxxxxxxxxxxxx")
       if(!this.animating){
           this.animating = true
-          if(inputMap["z"]){
+          if(inputMap["s"]){
             walking?.start(true,1.0,walking.from,walking.to,false)
           }
 
@@ -188,94 +379,24 @@ async CreateCommbatant(scene :Scene){
         this.animating = false
       }
     }
-    
+
+    hero.showBoundingBox=true
+
+    const mesh = new Mesh("newMesh", hero.getScene());
+
+// Copy relevant properties from AbstractMesh to Mesh
+    mesh.position.copyFrom(hero.position);
+    mesh.rotation.copyFrom(hero.rotation);
+    mesh.scaling.copyFrom(hero.scaling);
+    if(this.doMeshesCollide(mesh, this.octahedron1)){
+      
+    }
 
   })
 
   return scene;
 }
 
-async CreateCommbatant2(scene :Scene){
-  const {meshes,animationGroups,skeletons} = await SceneLoader.ImportMeshAsync('','../../assets/models/','combattant5.glb',scene)
-  console.log("meshes",meshes)
-  console.log(animationGroups)
-  console.log(skeletons)
-  animationGroups[0].stop()
-  const hero2 = meshes[0]
-  hero2.scaling.scaleInPlace(0.5)
-  
 
-  const skeleton = skeletons[0]
-  const speed = 0.03
-
-  const walk =   scene.getAnimationGroupByName("walk")
-  const doubleAttack2 = scene.getAnimationGroupByName("doubleAttack")
-  const attackSimple = scene.getAnimationGroupByName('Armature|mixamo.com|Layer0')
-  const walking = scene.getAnimationGroupByName("walking")
-
-  const inputMap:any = {}
-  scene.actionManager = new ActionManager(scene)
-  scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger,function (evt) {
-    inputMap[evt.sourceEvent.key] = evt.sourceEvent.type =="keydown"
-  }))
-  scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger,function(evt){
-    inputMap[evt.sourceEvent.key] =  evt.sourceEvent.type =="keydown"
-  }))
-
-
-
-  scene.onBeforeRenderObservable.add(() => {
-    var keydown = false
-    if(inputMap["w"]){
-      hero2.moveWithCollisions(hero2.forward.scaleInPlace(speed))
-      keydown = true
-    }
-
-    if(inputMap["x"]){
-      hero2.moveWithCollisions(hero2.forward.scaleInPlace(-speed))
-      keydown = true
-    }
-
-    if(inputMap["c"]){
-      hero2.rotate(Vector3.Up(),-0.1)
-      keydown = true
-    }
-
-    if(inputMap["v"]){
-      hero2.rotate(Vector3.Up(),0.1)
-      keydown = true
-    }
-    if(inputMap["b"]){
-      doubleAttack2?.start(false,1.0,doubleAttack2?.from,doubleAttack2.to,false)
-    }
-
-
-    if(keydown){
-      console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
-      if(!this.animating){
-          this.animating = true
-          if(inputMap["w"]){
-            walking?.start(true,1.0,walking.from,walking.to,false)
-          }
-
-      }
-    }
-    else{
-      if(this.animating){
-        const defaultAnim = animationGroups[5]
-        defaultAnim.start(true,1.0,defaultAnim.from, defaultAnim.to,false)
-        walk?.stop()
-        walking?.stop()
-        doubleAttack2?.stop()
-        attackSimple?.stop()
-        this.animating = false
-      }
-    }
-    
-
-  })
-
-  return scene;
-}
 
 }
