@@ -15,8 +15,8 @@ export class AccueilComponent implements OnInit {
   ChangePageRules(){
     this.router.navigate(["Rules"]);
   }
-  ChangePageDialogBox(){
-    this.router.navigate(["Question"]);
+  ChangePageModel(){
+    this.router.navigate(["Model"]);
   }
 
 }

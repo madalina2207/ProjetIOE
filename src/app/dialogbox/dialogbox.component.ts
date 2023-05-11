@@ -372,7 +372,7 @@ export class DialogboxComponent {
     modal.style.display = "block";
     nextButton.addEventListener('click', () => {
         //this.spin();
-        this.router.navigate(["/"]);
+        this.router.navigate(["Model"]);
         
      });
     

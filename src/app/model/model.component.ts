@@ -9,6 +9,7 @@ import { Color3, Vector3 } from '@babylonjs/core/Maths';
 import { AbstractMesh, Mesh, MeshBuilder } from '@babylonjs/core/Meshes';
 import "@babylonjs/loaders/glTF";
 import { DynamicTexture, Plane} from '@babylonjs/core';
+import { Router } from '@angular/router';
 
 // ...
 
@@ -32,7 +33,8 @@ export class ModelComponent implements OnInit {
   hero !: Mesh;
   target: any;
   box: any;
-  constructor() { }
+  
+  constructor(private router:Router) {  }
 
  async ngOnInit(): Promise<void> {
     const canva = document.querySelector('canvas')!
@@ -44,7 +46,9 @@ export class ModelComponent implements OnInit {
     this.CreatePlayStarter3(this.scene, 2.6, 0.35, 0)
     this.CreatePlayStarter4(this.scene, 4.0, 0.35, 1)
     this.CreatePlayStarter5(this.scene, 4.5, 0.35, 0)
-
+    window.location.href ="http://localhost:4200/?joueur1"
+    console.log(window.location.href)
+;
 };
 
 CreateBox(texte:any) : Mesh{
@@ -65,9 +69,20 @@ CreateBox(texte:any) : Mesh{
   const font = 'bold 60px Arial';
   const color = 'white';
   dynamicTexture.drawText(text, 20, 80, font, color, 'transparent', true);
+  box.actionManager = new ActionManager(this.scene);
+  box.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger,this.ChangePageDialogBox)
+  
+);
+
   return box;
 }
-  async CreateScene() : Promise<Scene>{
+
+ChangePageDialogBox(){
+  //this.router.navigate(["Model/Questions"]);
+  window.location.href = 'http://localhost:4200/Model/Questions'
+  //console.log("click")
+}
+async CreateScene() : Promise<Scene>{
     this.engine.enableOfflineSupport = false
     const scene = new Scene(this.engine)
     const camera = new FreeCamera("camera", new Vector3(2.2,0.75,-3.2), this.scene)
@@ -86,6 +101,8 @@ CreateBox(texte:any) : Mesh{
     scene.createDefaultSkybox(envTex, true)
     scene.environmentIntensity = 1
     const s = this.CreateCommbatant(scene)
+
+    
 
     // const s2 = this.CreateCommbatant2(scene)
     //const o = this.CreatePlayStarter(scene)
@@ -121,6 +138,7 @@ CreateBox(texte:any) : Mesh{
       this.scene.render()
       this.octahedron1.rotation.y += 0.01;
     })
+
 
 	
     return scene
@@ -296,12 +314,19 @@ intersectsBox(box1: BoundingBox, box2: BoundingBox): boolean {
   return true;
 }
 
-doMeshesCollide = (mesh1: Mesh, mesh2: Mesh): boolean => {
-  const boundingBox1 = mesh1.getBoundingInfo().boundingBox;
-  const boundingBox2 = mesh2.getBoundingInfo().boundingBox;
-
-  return this.intersectsBox(boundingBox1, boundingBox2);
-};
+/*doMeshesCollide = (mesh1: Mesh, mesh2: Mesh): boolean => {
+  //const boundingBox1 = this.octahedron1.getBoundingInfo().boundingBox;
+  //const boundingBox2 = this.octahedron2.getBoundingInfo().boundingBox;
+  //const boundingBox2 = mesh2.getBoundingInfo().boundingBox;
+  this.octahedron1.computeWorldMatrix(true); // Met à jour la matrice du mesh
+  this.octahedron2.computeWorldMatrix(true);
+  const boundingBox1 = this.octahedron1.getBoundingInfo().boundingBox;
+  const boundingBox2 = this.octahedron2.getBoundingInfo().boundingBox;
+  if(boundingBox1.intersectsBox(boundingBox2))
+boundingBox1.intersectsPoint
+  return boundingBox1.intersectsBox(boundingBox2)
+  //this.intersectsBox(boundingBox1, boundingBox2);
+};*/
 
 async CreateCommbatant(scene :Scene){
   const {meshes,animationGroups,skeletons} = await SceneLoader.ImportMeshAsync('','../../assets/models/','combattant5.glb',scene)
@@ -331,6 +356,8 @@ async CreateCommbatant(scene :Scene){
     inputMap[evt.sourceEvent.key] =  evt.sourceEvent.type =="keydown"
   }))
 
+  
+
 
   scene.onBeforeRenderObservable.add(() => {
     var keydown = false
@@ -359,7 +386,7 @@ async CreateCommbatant(scene :Scene){
 
 
     if(keydown){
-      console.log("xxxxxxxxxxxxxxxxxxxx")
+      //console.log("xxxxxxxxxxxxxxxxxxxx")
       if(!this.animating){
           this.animating = true
           if(inputMap["s"]){
@@ -378,22 +405,39 @@ async CreateCommbatant(scene :Scene){
         attackSimple?.stop()
         this.animating = false
       }
+       
     }
+    //const octBB = this.octahedron1.getBoundingInfo().intersects
+    //this.octahedron1.showBoundingBox=true;
+    const heroBB = hero.getBoundingInfo().boundingBox
+    //hero.showBoundingBox=true;
+    const point = new Vector3(1.0, 0.35, 0);
+    
+    //console.log(hero.position)
+    /*if(hero.intersectsMesh(this.octahedron1,false)){
+      console.log('Le guerrier a touché niveau 1')
+    }*/
+    if(heroBB.intersectsPoint(point)){
+      console.log('Le guerrier a touché niveau 1')
+    }
+    
+      
 
-    hero.showBoundingBox=true
+    
+    })
+    
+    //hero.showBoundingBox=true
 
-    const mesh = new Mesh("newMesh", hero.getScene());
+    //const mesh = new Mesh("newMesh", hero.getScene());
 
 // Copy relevant properties from AbstractMesh to Mesh
-    mesh.position.copyFrom(hero.position);
+   /* mesh.position.copyFrom(hero.position);
     mesh.rotation.copyFrom(hero.rotation);
     mesh.scaling.copyFrom(hero.scaling);
     if(this.doMeshesCollide(mesh, this.octahedron1)){
       
-    }
-
-  })
-
+    }*/
+    
   return scene;
 }
 
