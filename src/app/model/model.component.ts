@@ -49,6 +49,7 @@ export class ModelComponent implements OnInit {
     const canva = document.querySelector('canvas')!
     this.engine = new Engine(canva, true)
     this.scene = await this.CreateScene()
+    this.scene.collisionCoordinator
     this.CreateGroud()
     this.CreatePlayStarter(this.scene, 1.0, 0.35, 0)
     this.CreatePlayStarter2(this.scene, 1.8, 0.35, 1)
@@ -433,13 +434,14 @@ async CreateCommbatant(scene :Scene){
     }
     //const octBB = this.octahedron1.getBoundingInfo().intersects
     //this.octahedron1.showBoundingBox=true;
-    const heroBB = hero.getBoundingInfo().boundingBox
+    //var heroBB = hero.getBoundingInfo().boundingBox
     //hero.showBoundingBox=true;
     const point = new Vector3(1.0, 0.35, 0);
     
-    if(heroBB.intersectsPoint(point)){
+    
+    /*if(heroBB.intersectsPoint(point)){
       console.log('Le guerrier a touché niveau 1')
-    }
+    }*/
     
       
 
@@ -452,3 +454,7 @@ async CreateCommbatant(scene :Scene){
 
 
 }
+function CollisionCoordinator(): any {
+  throw new Error('Function not implemented.');
+}
+
