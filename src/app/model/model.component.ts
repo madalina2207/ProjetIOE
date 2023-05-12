@@ -9,7 +9,8 @@ import { Color3, Vector3 } from '@babylonjs/core/Maths';
 import { AbstractMesh, Mesh, MeshBuilder } from '@babylonjs/core/Meshes';
 import "@babylonjs/loaders/glTF";
 import { DynamicTexture, Plane} from '@babylonjs/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DataService } from '../data.service';
 
 // ...
 
@@ -33,8 +34,16 @@ export class ModelComponent implements OnInit {
   hero !: Mesh;
   target: any;
   box: any;
+  names!: string[];
+  pointsJ1 !: number;
+  pointsJ2 !: number ;
+  player1nom !:string;
+  player2nom !:string;
   
-  constructor(private router:Router) {  }
+  
+  constructor(private router:Router, private data: DataService, private route: ActivatedRoute) {  
+
+  }
 
  async ngOnInit(): Promise<void> {
     const canva = document.querySelector('canvas')!
@@ -46,10 +55,28 @@ export class ModelComponent implements OnInit {
     this.CreatePlayStarter3(this.scene, 2.6, 0.35, 0)
     this.CreatePlayStarter4(this.scene, 4.0, 0.35, 1)
     this.CreatePlayStarter5(this.scene, 4.5, 0.35, 0)
-    window.location.href ="http://localhost:4200/?joueur1"
-    console.log(window.location.href)
+    //this.names = this.data.getNames();
+    console.log(this.data.getNames())
+    this.player1nom=this.data.getName(0)
+    this.player2nom= this.data.getName(1)
+    const j1 = document.getElementById("joueur1") as HTMLDivElement; 
+    const j2 = document.getElementById("joueur2") as HTMLDivElement; 
+    this.majPoints();
+    j1.innerHTML = this.player1nom + " " +this.data.getP1() +" points";
+    j2.innerHTML = this.player2nom + " " +this.data.getP2() +" points";
+   
 ;
 };
+
+majPoints(){
+  if(this.data.getGagnantBox() == this.player1nom){
+    this.data.setP1()
+  }
+  else if (this.data.getGagnantBox() == this.player2nom){
+    this.data.setP2()
+  }
+  this.data.viderGagnantBox();
+}
 
 CreateBox(texte:any) : Mesh{
   const box = MeshBuilder.CreateBox('box', { size: 0.3 }, this.scene);
@@ -70,17 +97,14 @@ CreateBox(texte:any) : Mesh{
   const color = 'white';
   dynamicTexture.drawText(text, 20, 80, font, color, 'transparent', true);
   box.actionManager = new ActionManager(this.scene);
-  box.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger,this.ChangePageDialogBox)
-  
-);
+  //box.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger,this.ChangePageDialogBox));
+  box.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger,(evt) => {this.router.navigate(['Model', 'Questions']);}));
 
   return box;
 }
 
 ChangePageDialogBox(){
-  //this.router.navigate(["Model/Questions"]);
-  window.location.href = 'http://localhost:4200/Model/Questions'
-  //console.log("click")
+  this.router.navigate(["Model", "Questions"]);
 }
 async CreateScene() : Promise<Scene>{
     this.engine.enableOfflineSupport = false
@@ -413,10 +437,6 @@ async CreateCommbatant(scene :Scene){
     //hero.showBoundingBox=true;
     const point = new Vector3(1.0, 0.35, 0);
     
-    //console.log(hero.position)
-    /*if(hero.intersectsMesh(this.octahedron1,false)){
-      console.log('Le guerrier a touché niveau 1')
-    }*/
     if(heroBB.intersectsPoint(point)){
       console.log('Le guerrier a touché niveau 1')
     }
@@ -425,18 +445,6 @@ async CreateCommbatant(scene :Scene){
 
     
     })
-    
-    //hero.showBoundingBox=true
-
-    //const mesh = new Mesh("newMesh", hero.getScene());
-
-// Copy relevant properties from AbstractMesh to Mesh
-   /* mesh.position.copyFrom(hero.position);
-    mesh.rotation.copyFrom(hero.rotation);
-    mesh.scaling.copyFrom(hero.scaling);
-    if(this.doMeshesCollide(mesh, this.octahedron1)){
-      
-    }*/
     
   return scene;
 }

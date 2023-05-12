@@ -11,6 +11,8 @@ import { PlayStarterComponent } from './play-starter/play-starter.component';
 import { RulesComponent } from './rules/rules.component';
 import { AppRoutingModule } from './app.routing.module';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { DataService } from './data.service';
 
 @NgModule({
   declarations: [
@@ -26,9 +28,11 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule
   ],
-  providers: [],
+  providers: [DataService],
   bootstrap: [AppComponent]
+  
 })
 export class AppModule { }

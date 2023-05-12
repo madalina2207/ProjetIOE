@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApiQuizzable } from '../ApiQuizzable.service';
 import { categorie } from '../categorie';
 import { reponse } from '../reponse';
@@ -7,16 +7,19 @@ import { question } from '../question';
 import { waitForAsync } from '@angular/core/testing';
 import { ThinTexture } from '@babylonjs/core';
 import { Router } from '@angular/router';
+import { DataService } from '../data.service';
 
 @Component({
   selector: 'app-dialogbox',
   templateUrl: './dialogbox.component.html',
   styleUrls: ['./dialogbox.component.css']
 })
-export class DialogboxComponent {
+export class DialogboxComponent implements OnInit {
 
   answerKey1 !: String;
   answerKey2 !: String;
+  player1Nom !: string;
+  player2Nom !: string;
   player1Keys = ['a', 'z', 'e']; // Touches pour joueur 1
   player2Keys = ['i', 'o', 'p']; // Touches pour joueur 2
   player1Choices = 0; // Nombre de choix pour joueur 1
@@ -37,7 +40,9 @@ export class DialogboxComponent {
   
   
 
-  constructor(private apiQuizz: ApiQuizzable, private router:Router) {
+  constructor(private apiQuizz: ApiQuizzable, private router:Router, private data: DataService) {
+    this.player1Nom=this.data.getName(0);
+    this.player2Nom=this.data.getName(1);
   }
 
   ngOnInit(): void{
@@ -46,6 +51,8 @@ export class DialogboxComponent {
     this.apiQuizz.getListeReponse().subscribe((data: reponse[]) => {this.listeReponses=data;});
     this.apiQuizz.getListeRepCorrecte().subscribe((data: reponsescorrectes[]) => {this.listeRepCorrectes=data;});
     this.partie();
+    
+    console.log(this.data.getNames())
   }  
 
   spin() {
@@ -238,7 +245,7 @@ export class DialogboxComponent {
           document.removeEventListener('keydown', jeu);
           countdown.innerHTML = ''
           this.player1Points= this.player1Points +5;
-          this.questionTermine('Le J1 à gagné ce tour');
+          this.questionTermine(this.player1Nom+ ' à gagné ce tour');
           
         }
         else{
@@ -249,7 +256,7 @@ export class DialogboxComponent {
             document.removeEventListener('keydown', jeu);
             countdown.innerHTML = ''
             this.player2Points= this.player2Points +5;
-            this.questionTermine('Le J2 à gagné ce tour');
+            this.questionTermine(this.player2Nom+' à gagné ce tour');
           } 
         }
     
@@ -263,7 +270,7 @@ export class DialogboxComponent {
           document.removeEventListener('keydown', jeu);
           countdown.innerHTML = ''
           this.player2Points= this.player2Points +5;
-          this.questionTermine('Le J2 à gagné ce tour');
+          this.questionTermine(this.player2Nom+' à gagné ce tour');
           
         }
         else{
@@ -274,7 +281,7 @@ export class DialogboxComponent {
             document.removeEventListener('keydown', jeu);
             countdown.innerHTML = ''
             this.player1Points= this.player1Points +5;
-            this.questionTermine('Le J1 à gagné ce tour');
+            this.questionTermine(this.player1Nom+ ' à gagné ce tour');
           }  
         }
       
@@ -338,6 +345,7 @@ export class DialogboxComponent {
     
   }
   
+
   partie(){
   
     const spinButton = document.querySelector('#spin') as HTMLButtonElement;
@@ -353,11 +361,36 @@ export class DialogboxComponent {
       spinButton.disabled = true; // Désactiver le bouton une fois que le nombre maximal de clics a été atteint
       if(this.player1Points>this.player2Points){
         console.log(this.player1Points , this.player2Points)
-        this.partieTermine('Fin de la partie le J1 à gagne!');
+        this.data.addGagnantBox(this.player1Nom);
+        this.partieTermine('Fin de la partie ' +this.player1Nom+ ' à gagne!');
       }
-      else  
+      else if (this.player1Points<this.player2Points){
         console.log(this.player1Points , this.player2Points)
-        this.partieTermine('Fin de la partie le J2 à gagne!');
+        this.data.addGagnantBox(this.player2Nom);
+        this.partieTermine('Fin de la partie' +this.player2Nom+' à gagne!');
+      }
+      else if (this.player1Points==this.player2Points) {
+        spinButton.disabled = false;
+        let gagnant=false;
+        console.log('Hello')
+        while (!gagnant){
+          console.log('avant spin')
+          this.spin()
+          console.log('apres spin')
+          if(this.player1Points>this.player2Points){
+            gagnant=true;
+            console.log('J1 a gagne')
+            this.data.addGagnantBox(this.player1Nom);
+            this.partieTermine('Fin de la partie ' +this.player1Nom+ ' à gagne!');
+          }
+          else if (this.player1Points<this.player2Points){
+            gagnant=true;
+            console.log('J2 a gagné')
+            this.data.addGagnantBox(this.player2Nom);
+            this.partieTermine('Fin de la partie' +this.player2Nom+' à gagne!');
+          }
+        }
+      }
     }
     });
     this.player1Points=0;
@@ -371,9 +404,7 @@ export class DialogboxComponent {
     phrasePopup.innerHTML = phrase;
     modal.style.display = "block";
     nextButton.addEventListener('click', () => {
-        //this.spin();
         this.router.navigate(["Model"]);
-        
      });
     
   }

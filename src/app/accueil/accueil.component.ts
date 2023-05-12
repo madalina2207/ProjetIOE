@@ -1,5 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { DataService } from '../data.service';
+import { CommonModule } from '@angular/common';
+
+
 
 @Component({
   selector: 'app-accueil',
@@ -7,8 +11,12 @@ import { Router } from '@angular/router';
   styleUrls: ['./accueil.component.css']
 })
 export class AccueilComponent implements OnInit {
+  
+  joueur1 !: string;
+  joueur2 !: string;
+  name: string[] = []
 
-  constructor(private router:Router) {}
+  constructor(private router:Router , private data: DataService) {}
 
   ngOnInit(): void {
   }
@@ -16,8 +24,20 @@ export class AccueilComponent implements OnInit {
     this.router.navigate(["Rules"]);
   }
   ChangePageModel(){
+    //console.log(this.joueur1, this.joueur2)
+    this.data.addName(this.joueur1);
+    this.data.addName(this.joueur2);
+    this.data.initializeP1();
+    this.data.initializeP2();
     this.router.navigate(["Model"]);
   }
+
+  onNameChange(name1: string, name2: string) {
+    this.data.addName(name1);
+    
+  }
+
+ 
 
 }
 
