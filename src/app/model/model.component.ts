@@ -49,7 +49,6 @@ export class ModelComponent implements OnInit {
     const canva = document.querySelector('canvas')!
     this.engine = new Engine(canva, true)
     this.scene = await this.CreateScene()
-    this.scene.collisionCoordinator
     this.CreateGroud()
     this.CreatePlayStarter(this.scene, 1.0, 0.35, 0)
     this.CreatePlayStarter2(this.scene, 1.8, 0.35, 1)
@@ -65,6 +64,61 @@ export class ModelComponent implements OnInit {
     this.majPoints();
     j1.innerHTML = this.player1nom + " " +this.data.getP1() +" points";
     j2.innerHTML = this.player2nom + " " +this.data.getP2() +" points";
+
+    const b1 = this.CreateBox('Niveau 1').setPositionWithLocalVector(new Vector3(1,-0.01,0));
+    const b2 = this.CreateBox('Niveau 2').setPositionWithLocalVector(new Vector3(1.8,0,1)); 
+    const b3 = this.CreateBox('Niveau 3').setPositionWithLocalVector(new Vector3(2.6,-0.01,0));
+    const b4 = this.CreateBox('Niveau 4').setPositionWithLocalVector(new Vector3(4.0,0,1)); 
+    const b5 = this.CreateBox('Niveau 5').setPositionWithLocalVector(new Vector3(4.5,-0.01,0));
+    console.log(this.data.getP1(), this.data.getP1())
+    if(this.data.getP1()+this.data.getP2()==0){
+      b1.setEnabled(true);
+      b2.setEnabled(false);
+      b3.setEnabled(false);
+      b4.setEnabled(false);
+      b5.setEnabled(false);
+    }
+    else if (this.data.getP1()+this.data.getP2()==1){
+      b1.setEnabled(false);
+      b2.setEnabled(true);
+      b3.setEnabled(false);
+      b4.setEnabled(false);
+      b5.setEnabled(false);
+    }
+    else if (this.data.getP1()+this.data.getP2()==2){
+      b1.setEnabled(false);
+      b2.setEnabled(false);
+      b3.setEnabled(true);
+      b4.setEnabled(false);
+      b5.setEnabled(false);
+    }
+    else if (this.data.getP1()+this.data.getP2()==3){
+      b1.setEnabled(false);
+      b2.setEnabled(false);
+      b3.setEnabled(false);
+      b4.setEnabled(true);
+      b5.setEnabled(false);
+    }else if (this.data.getP1()+this.data.getP2()==4){
+      b1.setEnabled(false);
+      b2.setEnabled(false);
+      b3.setEnabled(false);
+      b4.setEnabled(false);
+      b5.setEnabled(true);
+    }else if (this.data.getP1()+this.data.getP2()==5){
+      b1.setEnabled(false);
+      b2.setEnabled(false);
+      b3.setEnabled(false);
+      b4.setEnabled(false);
+      b5.setEnabled(false);
+      if(this.data.getP1()>this.data.getP2()){
+        console.log(this.data.getP1() , this.data.getP2())
+        this.partieTermine('Fin de la partie ' +this.player1nom+ ' a gagne!');
+      }
+      else{
+        console.log(this.pointsJ1 , this.pointsJ2)
+        this.partieTermine('Fin de la partie ' +this.player2nom+ ' a gagne!');
+      }
+    }
    
 ;
 };
@@ -99,7 +153,10 @@ CreateBox(texte:any) : Mesh{
   dynamicTexture.drawText(text, 20, 80, font, color, 'transparent', true);
   box.actionManager = new ActionManager(this.scene);
   //box.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger,this.ChangePageDialogBox));
-  box.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger,(evt) => {this.router.navigate(['Model', 'Questions']);}));
+  box.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger,
+    (evt) => {
+      this.router.navigate(['Model', 'Questions']);
+    }));
 
   return box;
 }
@@ -107,6 +164,21 @@ CreateBox(texte:any) : Mesh{
 ChangePageDialogBox(){
   this.router.navigate(["Model", "Questions"]);
 }
+
+partieTermine(phrase : string) {
+  const modal = document.getElementById("endPartie") as HTMLDivElement;
+  const nextButton = document.querySelector('#acc') as HTMLButtonElement;
+  const phrasePopup = document.getElementById("phraseFin") as HTMLDivElement;
+  phrasePopup.innerHTML = phrase;
+  modal.style.display = "block";
+  nextButton.addEventListener('click', () => {
+      //this.spin();
+      this.router.navigate([""]);
+      
+   });
+  
+}
+
 async CreateScene() : Promise<Scene>{
     this.engine.enableOfflineSupport = false
     const scene = new Scene(this.engine)
@@ -115,12 +187,8 @@ async CreateScene() : Promise<Scene>{
     camera.attachControl()
     camera.speed = 0.25
     
-    this.CreateBox('Niveau 1').setPositionWithLocalVector(new Vector3(1,-0.01,0));
-    this.CreateBox('Niveau 2').setPositionWithLocalVector(new Vector3(1.8,0,1)); 
-    this.CreateBox('Niveau 3').setPositionWithLocalVector(new Vector3(2.6,-0.01,0));
-    this.CreateBox('Niveau 4').setPositionWithLocalVector(new Vector3(4.0,0,1)); 
-    this.CreateBox('Niveau 5').setPositionWithLocalVector(new Vector3(4.5,-0.01,0));
-
+    
+    
     const envTex = CubeTexture.CreateFromPrefilteredData("../../assets/env/sky.env",scene)
     scene.environmentTexture = envTex
     scene.createDefaultSkybox(envTex, true)
@@ -434,14 +502,13 @@ async CreateCommbatant(scene :Scene){
     }
     //const octBB = this.octahedron1.getBoundingInfo().intersects
     //this.octahedron1.showBoundingBox=true;
-    //var heroBB = hero.getBoundingInfo().boundingBox
+    const heroBB = hero.getBoundingInfo().boundingBox
     //hero.showBoundingBox=true;
     const point = new Vector3(1.0, 0.35, 0);
     
-    
-    /*if(heroBB.intersectsPoint(point)){
+    if(heroBB.intersectsPoint(point)){
       console.log('Le guerrier a touché niveau 1')
-    }*/
+    }
     
       
 
@@ -454,7 +521,3 @@ async CreateCommbatant(scene :Scene){
 
 
 }
-function CollisionCoordinator(): any {
-  throw new Error('Function not implemented.');
-}
-
