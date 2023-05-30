@@ -1,0 +1,36 @@
+{
+    "correctionList": [
+      {
+        "questionId": 1,
+        "responseIndex": 2
+      },
+      {
+        "questionId": 2,
+        "responseIndex": 0
+      },
+      {
+        "questionId": 3,
+        "responseIndex": 2
+      },
+      {
+        "questionId": 4,
+        "responseIndex": 1
+      },
+      {
+        "questionId": 5,
+        "responseIndex": 2
+      },
+      {
+        "questionId": 6,
+        "responseIndex": 0
+      },
+      {
+        "questionId": 7,
+        "responseIndex": 1
+      },
+      {
+        "questionId": 8,
+        "responseIndex": 0
+      }
+    ]
+  }

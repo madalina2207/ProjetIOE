@@ -25,7 +25,8 @@ export class ModelComponent implements OnInit {
 
   scene!:Scene
   engine!:Engine
-  animating = true
+  animating_1 = true
+  animating_2 = true
   octahedron1 !: Mesh;
   octahedron2 !: Mesh;
   octahedron3 !: Mesh;
@@ -62,8 +63,135 @@ export class ModelComponent implements OnInit {
     const j1 = document.getElementById("joueur1") as HTMLDivElement; 
     const j2 = document.getElementById("joueur2") as HTMLDivElement; 
     this.majPoints();
-    j1.innerHTML = this.player1nom + " " +this.data.getP1() +" points";
-    j2.innerHTML = this.player2nom + " " +this.data.getP2() +" points";
+    j1.innerHTML = this.player1nom + ": " +this.data.getP1() +" points";
+    j2.innerHTML = this.player2nom + ": " +this.data.getP2() +" points";
+
+    const  hero   =  await this.CreateCommbatant(this.scene)
+    hero.setPositionWithLocalVector(new Vector3(0.5,0,0));
+    const  hero2  = await this.CreateCommbatant2(this.scene)
+    const speed = 0.03
+
+    const walk =   this.scene.getAnimationGroupByName("walk")
+    const doubleAttack = this.scene.getAnimationGroupByName("doubleAttack")
+    const attackSimple = this.scene.getAnimationGroupByName('Armature|mixamo.com|Layer0')
+    const walking = this.scene.getAnimationGroupByName("walking")
+    const block   =  this.scene.getAnimationGroupByName("block")
+
+    const run  = this.scene.getAnimationGroupByName('run')
+    const runback = this.scene.getAnimationGroupByName('runback')
+    const id      =  this.scene.getAnimationGroupByName('id')
+    const coupDePiedAllonger = this.scene.getAnimationGroupByName('coupDePiedAllonger')
+    const coupDePied = this.scene.getAnimationGroupByName('coupDePied')
+    const coupDePointPuissant = this.scene.getAnimationGroupByName('coupDePointPuissant')
+
+    const inputMap:any = {}
+    this.scene.actionManager = new ActionManager(this.scene)
+    this.scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger,function (evt) {
+      inputMap[evt.sourceEvent.key] = evt.sourceEvent.type =="keydown"
+    }))
+    this.scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger,function(evt){
+      inputMap[evt.sourceEvent.key] =  evt.sourceEvent.type =="keydown"
+    }))
+
+
+
+   this.scene.onBeforeRenderObservable.add(() => {
+      var keydown = false
+      if(inputMap["s"]){
+        hero.moveWithCollisions(hero.forward.scaleInPlace(speed))
+        keydown = true
+      }
+
+      if(inputMap["x"]){
+        hero.moveWithCollisions(hero.forward.scaleInPlace(-speed))
+        keydown = true
+      }
+
+      if(inputMap["w"]){
+        hero.rotate(Vector3.Up(),-0.1)
+        keydown = true
+      }
+
+      if(inputMap["c"]){
+        hero.rotate(Vector3.Up(),0.1)
+        keydown = true
+      }
+
+      if(inputMap["d"]){
+        doubleAttack?.start(false,1.0,doubleAttack?.from,doubleAttack.to,false)
+      }
+
+
+
+      // HERO 2
+
+      if(inputMap["g"]){
+        hero2.moveWithCollisions(hero2.forward.scaleInPlace(speed))
+        keydown = true
+      }
+      if(inputMap["b"]){
+        hero2.moveWithCollisions(hero2.forward.scaleInPlace(-speed))
+        keydown = true
+      }
+
+      if(inputMap["v"]){
+        hero2.rotate(Vector3.Up(),-0.1)
+        keydown = true
+      }
+
+      if(inputMap["n"]){
+        hero2.rotate(Vector3.Up(),0.1)
+        keydown = true
+      }
+
+      if(inputMap["h"]){
+        coupDePiedAllonger?.start(false,1.0,coupDePiedAllonger?.from,coupDePiedAllonger?.to,false)
+
+      }
+
+      if(inputMap["j"]){
+        coupDePointPuissant?.start(false,1.0,coupDePointPuissant?.from,coupDePointPuissant?.to,false)
+      }
+
+
+
+
+
+      if(keydown){
+        if(!this.animating_1){
+            this.animating_1 = true
+            if(inputMap["s"]){
+              walking?.start(true,1.0,walking.from,walking.to,false)
+            }
+
+            if(inputMap["g"]){
+              run?.start(true,1.0,run.from,run.to,false)
+            }
+
+            if(inputMap["b"]){
+              runback?.start(true,1.0,runback.from,runback.to,false)
+            }
+
+
+        }
+      }
+      else{
+        if(this.animating_1){
+          coupDePiedAllonger?.stop()
+          runback?.stop()
+          run?.stop()
+          walk?.stop()
+          walking?.stop()
+          doubleAttack?.stop()
+          attackSimple?.stop()
+          id?.start()
+          block?.start()
+          this.animating_1 = false
+
+        }
+      }
+
+    })
 
     const b1 = this.CreateBox('Niveau 1').setPositionWithLocalVector(new Vector3(1,-0.01,0));
     const b2 = this.CreateBox('Niveau 2').setPositionWithLocalVector(new Vector3(1.8,0,1)); 
@@ -193,16 +321,7 @@ async CreateScene() : Promise<Scene>{
     scene.environmentTexture = envTex
     scene.createDefaultSkybox(envTex, true)
     scene.environmentIntensity = 1
-    const s = this.CreateCommbatant(scene)
-
-    
-
-    // const s2 = this.CreateCommbatant2(scene)
-    //const o = this.CreatePlayStarter(scene)
-    const sc = await s;
-    // sc = await s2;
-    //sc= await s2;
-    return sc
+    return scene
   }
 
   CreatePlayStarter(scene : Scene, pos1: float, pos2: float, pos3:float) : Scene{
@@ -434,90 +553,28 @@ async CreateCommbatant(scene :Scene){
   const skeleton = skeletons[0]
   const speed = 0.01
 
-  const walk =   scene.getAnimationGroupByName("walk")
-  const doubleAttack = scene.getAnimationGroupByName("doubleAttack")
-  const attackSimple = scene.getAnimationGroupByName('Armature|mixamo.com|Layer0')
-  const walking = scene.getAnimationGroupByName("walking")
-
-
-  const inputMap:any = {}
-  scene.actionManager = new ActionManager(scene)
-  scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger,function (evt) {
-    inputMap[evt.sourceEvent.key] = evt.sourceEvent.type =="keydown"
-  }))
-  scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger,function(evt){
-    inputMap[evt.sourceEvent.key] =  evt.sourceEvent.type =="keydown"
-  }))
-
-  
-
-
-  scene.onBeforeRenderObservable.add(() => {
-    var keydown = false
-    if(inputMap["s"]){
-      hero.moveWithCollisions(hero.forward.scaleInPlace(speed))
-      keydown = true
-    }
-
-    if(inputMap["x"]){
-      hero.moveWithCollisions(hero.forward.scaleInPlace(-speed))
-      keydown = true
-    }
-
-    if(inputMap["w"]){
-      hero.rotate(Vector3.Up(),-0.1)
-      keydown = true
-    }
-
-    if(inputMap["c"]){
-      hero.rotate(Vector3.Up(),0.1)
-      keydown = true
-    }
-    if(inputMap["d"]){
-      doubleAttack?.start(false,1.0,doubleAttack?.from,doubleAttack.to,false)
-    }
-
-
-    if(keydown){
-      //console.log("xxxxxxxxxxxxxxxxxxxx")
-      if(!this.animating){
-          this.animating = true
-          if(inputMap["s"]){
-            walking?.start(true,1.0,walking.from,walking.to,false)
-          }
-
-      }
-    }
-    else{
-      if(this.animating){
-        const defaultAnim = animationGroups[5]
-        defaultAnim.start(true,1.0,defaultAnim.from, defaultAnim.to,false)
-        walk?.stop()
-        walking?.stop()
-        doubleAttack?.stop()
-        attackSimple?.stop()
-        this.animating = false
-      }
-       
-    }
-    //const octBB = this.octahedron1.getBoundingInfo().intersects
-    //this.octahedron1.showBoundingBox=true;
-    const heroBB = hero.getBoundingInfo().boundingBox
-    //hero.showBoundingBox=true;
-    const point = new Vector3(1.0, 0.35, 0);
-    
-    if(heroBB.intersectsPoint(point)){
-      console.log('Le guerrier a touché niveau 1')
-    }
-    
-      
-
-    
-    })
-    
-  return scene;
+  return hero;
 }
 
+async CreateCommbatant2(scene :Scene){
+  const {meshes,animationGroups,skeletons} = await SceneLoader.ImportMeshAsync('','../../assets/models/','guerrier.glb',scene)
+  console.log("meshes",meshes)
+  console.log(animationGroups)
+  console.log(skeletons)
+  animationGroups[0].stop()
+  const hero2 = meshes[0]
+  hero2.scaling.scaleInPlace(0.5)
 
+
+  const skeleton = skeletons[0]
+  const speed = 0.01
+
+  const walk =   scene.getAnimationGroupByName("walk")
+  const doubleAttack2 = scene.getAnimationGroupByName("doubleAttack")
+  const attackSimple = scene.getAnimationGroupByName('Armature|mixamo.com|Layer0')
+  const walking = scene.getAnimationGroupByName("walking")
+  console.log(walking)
+  return hero2;
+}
 
 }

@@ -1,0 +1,84 @@
+{
+    "questionList": [
+      {
+        "id": 1,
+        "question": "Combien de temps faut-il pour que le CO2 soit éliminé de l'atmosphère?",
+        "categorie": "Air",
+        "responses": [
+          "Quelques années",
+          "Des décennies",
+          "Des siècles"
+        ]
+      },
+      {
+        "id": 2,
+        "question": "Quelle est la température moyenne annuelle en France mesurée en 2020?",
+        "categorie": "Climat",
+        "responses": [
+          "14.1°C",
+          "15.6°C",
+          "18.2°C"
+        ]
+      },
+      {
+        "id": 3,
+        "question": "Combien de temps faut-il pour qu'une bouteille en plastique se décompose dans la nature?",
+        "categorie": "Dechets",
+        "responses": [
+          "1 million",
+          "10 millions",
+          "100 millions"
+        ]
+      },
+      {
+        "id": 4,
+        "question": "La biodiversité peut être définie de manière suivante:",
+        "categorie": "Biologie",
+        "responses": [
+          "La présence d'une espèce protégée dans une certaine zone",
+          "Le nombre d'espèces de familles et de genres différents présents dans un biotope",
+          "Le nombre d'individus présents dans un biotope"
+        ]
+      },
+      {
+        "id": 5,
+        "question": "Quelle est la principale source de pollution plastique dans les océans?",
+        "categorie": "Pollution",
+        "responses": [
+          "Les déchets provenant des bateaux de pêche",
+          "Les déchets provenant des centrales électriques",
+          "Les déchets provenant des rivières et des canaux d'écoulement"
+        ]
+      },
+      {
+        "id": 6,
+        "question": "Quelle est la principale source de pollution de l'eau?",
+        "categorie": "Eau",
+        "responses": [
+          "Les rejets industriels",
+          "Les pesticides utilisés dans l'agriculture",
+          "La pluie acide"
+        ]
+      },
+      {
+        "id": 7,
+        "question": "Qu'est-ce que les ressources naturelles ?",
+        "categorie": "Ressources naturelles",
+        "responses": [
+          "Des biens produits par l'homme",
+          "Des biens produits par la nature",
+          "Des biens produits par les animaux"
+        ]
+      },
+      {
+        "id": 8,
+        "question": "Quelle est la principale cause d''une éruption volcanique ?",
+        "categorie": "Catastrophes naturelles",
+        "responses": [
+          "Le magma atteint la surface de la Terre",
+          "Tremblements de terre",
+          "L'impact d'un météore"
+        ]
+      }
+    ]
+  }

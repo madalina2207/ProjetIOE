@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiQuizzable } from '../ApiQuizzable.service';
-import { categorie } from '../categorie';
-import { reponse } from '../reponse';
 import { reponsescorrectes } from '../reponsescorrectes';
-import { question } from '../question';
 import { waitForAsync } from '@angular/core/testing';
 import { ThinTexture } from '@babylonjs/core';
 import { Router } from '@angular/router';
 import { DataService } from '../data.service';
+import question from "../../data/question.json";
+import reponse from "../../data/reponse.json";
+import { Reponse } from '../Reponse1';
+import { Reponsescorrectes } from '../Reponsescorrectes1';
+import { Question } from '../Question1'
+import { notStrictEqual } from 'assert';
 
 @Component({
   selector: 'app-dialogbox',
@@ -28,64 +31,71 @@ export class DialogboxComponent implements OnInit {
   player1Points =0;
   player2Points = 0;
 
-  listeCategorie: categorie []= [];
-  listeQuestions: question []= [];
-  listeReponses: reponse []= [];
+  listeCategorie1: string []= [];
+  listeQuestions1: Question []= [];
+  listeReponses1: Reponse []= [];
+  listeRepCorrectes1: Reponsescorrectes []= [];
   listeRepCorrectes: reponsescorrectes []= [];
 
   texteCat !: String;
   q !: String;
-  idQuest !: String;
+  idQuest !: number;
   idRep : String []=[];
   
-  
-
   constructor(private apiQuizz: ApiQuizzable, private router:Router, private data: DataService) {
     this.player1Nom=this.data.getName(0);
     this.player2Nom=this.data.getName(1);
   }
 
   ngOnInit(): void{
-    this.apiQuizz.getListeCat().subscribe((data: categorie[]) => {this.listeCategorie=data;});
-    this.apiQuizz.getListeQuestion().subscribe((data: question[]) => {this.listeQuestions=data;});
-    this.apiQuizz.getListeReponse().subscribe((data: reponse[]) => {this.listeReponses=data;});
-    this.apiQuizz.getListeRepCorrecte().subscribe((data: reponsescorrectes[]) => {this.listeRepCorrectes=data;});
-    this.partie();
+    // this.apiQuizz.getListeCat().subscribe((data: categorie[]) => {this.listeCategorie=data;});
+    // this.apiQuizz.getListeQuestion().subscribe((data: question[]) => {this.listeQuestions=data;});
+    // this.apiQuizz.getListeReponse().subscribe((data: reponse[]) => {this.listeReponses=data;});
+    // this.apiQuizz.getListeRepCorrecte().subscribe((data: reponsescorrectes[]) => {this.listeRepCorrectes=data;});
+    const questiondata=question.questionList;
+    const responsesdata=reponse.correctionList;
+    if (questiondata && responsesdata){
     
-    console.log(this.data.getNames())
+      this.listeQuestions1= questiondata.map(question => ({
+        idQ: question.id,
+        categorie: question.categorie,
+        question: question.question,
+      }));
+
+      this.listeReponses1= questiondata.map(question => ({
+        idQ: question.id,
+        rep: question.responses,
+      }));
+
+      this.listeRepCorrectes1= responsesdata.map(reponse => ({
+        idQ: reponse.questionId,
+        index: reponse.responseIndex,
+      }));
+    }
+    this.partie();
   }  
 
   spin() {
     this.number += 100 + Math.ceil(Math.random() * 1000);
     const container = document.querySelector(".container") as HTMLElement;
     container.style.transform = `rotate(${this.number}deg)`;
-    console.log('number=',this.number);
     let deg = this.number%360;
-    console.log('deg=',deg);
 
     if (deg >= 0 && deg <= 45) {
-      console.log("Air");
       this.texteCat="Air";
     } else if (deg > 45 && deg <= 90) {
-      console.log("Cat. nat");
       this.texteCat="Catastrophes naturelles";
     } else if (deg > 90 && deg <= 135) {
-      console.log("Res. nat")
       this.texteCat="Ressources naturelles";
     } else if (deg > 135 && deg <= 180) {
-      console.log("Eau");
       this.texteCat="Eau";
     } else if (deg > 180 && deg <= 225) {
-      console.log("Pollution");
       this.texteCat="Pollution";
     } else if (deg > 225 && deg <= 270) {
-      console.log("Biologie");
       this.texteCat="Biologie";
     } else if (deg > 270 && deg <= 315) {
-      console.log("Dechets");
       this.texteCat="Dechets";
     } else if ((deg > 315 && deg < 360)||(deg=0)) {
-      console.log("Climat");
       this.texteCat="Climat";
     }
     
@@ -124,34 +134,21 @@ export class DialogboxComponent implements OnInit {
   }
 
   selectionQuestion(): String {
-    let i=0;
-    let nb;
+    const filteredquestions=this.listeQuestions1.filter(question=>
+      question.categorie===this.texteCat
+    )
+    const randomIndex=Math.floor(Math.random() * filteredquestions.length);
+    this.idQuest=filteredquestions[randomIndex].idQ;
+    return filteredquestions[randomIndex].question
 
-    while(true){
-      if (this.listeCategorie[i].nomCat=== this.texteCat){
-        nb=Math.ceil(Math.random() * 25);
-        //console.log(this.listeCategorie[i].questions[nb].question)
-        this.idQuest= this.listeCategorie[i].questions[nb].idQ;
-        return this.listeCategorie[i].questions[nb].question;
-      }
-      i=i+1;
-    }     
   }
 
   recupererReponses() : String[] {
-    let i=0;
-    const Rep : String [] = [];
-    this.idRep=[];
-    while(i<this.listeReponses.length){
-      if (this.listeReponses[i].question.idQ === this.idQuest){
-        this.idRep.push(this.listeReponses[i].idR)
-        Rep.push(this.listeReponses[i].rep)
-      }
-      i=i+1;
-    }
-    console.log(Rep);
-    console.log(this.idRep);
-    return Rep;
+    const item=this.listeReponses1.find(
+      question=>
+        question.idQ===this.idQuest
+    )
+    return item ? item.rep : [];
   }
 
   answerKey(){
@@ -362,12 +359,12 @@ export class DialogboxComponent implements OnInit {
       if(this.player1Points>this.player2Points){
         console.log(this.player1Points , this.player2Points)
         this.data.addGagnantBox(this.player1Nom);
-        this.partieTermine('Fin de la partie ' +this.player1Nom+ ' à gagne!');
+        this.partieTermine('Fin de la partie ' +this.player1Nom+ ' a gagne!');
       }
       else if (this.player1Points<this.player2Points){
         console.log(this.player1Points , this.player2Points)
         this.data.addGagnantBox(this.player2Nom);
-        this.partieTermine('Fin de la partie' +this.player2Nom+' à gagne!');
+        this.partieTermine('Fin de la partie ' +this.player2Nom+' a gagne!');
       }
       else if (this.player1Points==this.player2Points) {
         spinButton.disabled = false;
@@ -381,13 +378,13 @@ export class DialogboxComponent implements OnInit {
             gagnant=true;
             console.log('J1 a gagne')
             this.data.addGagnantBox(this.player1Nom);
-            this.partieTermine('Fin de la partie ' +this.player1Nom+ ' à gagne!');
+            this.partieTermine('Fin de la partie ' +this.player1Nom+ ' a gagne!');
           }
           else if (this.player1Points<this.player2Points){
             gagnant=true;
             console.log('J2 a gagné')
             this.data.addGagnantBox(this.player2Nom);
-            this.partieTermine('Fin de la partie' +this.player2Nom+' à gagne!');
+            this.partieTermine('Fin de la partie ' +this.player2Nom+' a gagne!');
           }
         }
       }
