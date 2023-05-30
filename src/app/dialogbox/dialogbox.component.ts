@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiQuizzable } from '../ApiQuizzable.service';
-import { reponsescorrectes } from '../reponsescorrectes';
 import { waitForAsync } from '@angular/core/testing';
 import { ThinTexture } from '@babylonjs/core';
 import { Router } from '@angular/router';
@@ -35,23 +33,18 @@ export class DialogboxComponent implements OnInit {
   listeQuestions1: Question []= [];
   listeReponses1: Reponse []= [];
   listeRepCorrectes1: Reponsescorrectes []= [];
-  listeRepCorrectes: reponsescorrectes []= [];
 
   texteCat !: String;
   q !: String;
   idQuest !: number;
   idRep : String []=[];
   
-  constructor(private apiQuizz: ApiQuizzable, private router:Router, private data: DataService) {
+  constructor(private router:Router, private data: DataService) {
     this.player1Nom=this.data.getName(0);
     this.player2Nom=this.data.getName(1);
   }
 
   ngOnInit(): void{
-    // this.apiQuizz.getListeCat().subscribe((data: categorie[]) => {this.listeCategorie=data;});
-    // this.apiQuizz.getListeQuestion().subscribe((data: question[]) => {this.listeQuestions=data;});
-    // this.apiQuizz.getListeReponse().subscribe((data: reponse[]) => {this.listeReponses=data;});
-    // this.apiQuizz.getListeRepCorrecte().subscribe((data: reponsescorrectes[]) => {this.listeRepCorrectes=data;});
     const questiondata=question.questionList;
     const responsesdata=reponse.correctionList;
     if (questiondata && responsesdata){
@@ -154,27 +147,21 @@ export class DialogboxComponent implements OnInit {
   answerKey(){
     this.answerKey1="";
     this.answerKey2="";
-    let i=0;
-    let keyNb;
-    while(i<this.listeRepCorrectes.length){
-      for(let j=0;j <this.idRep.length; j++){
-        if(this.idRep[j]===this.listeRepCorrectes[i].reponse.idR){
-          keyNb=j;
-          console.log(this.listeRepCorrectes[i].idRC)
-        }
-      }
-      i=i+1;
-    }
-    console.log(keyNb)
-    if(keyNb==0){
+    
+    const item=this.listeRepCorrectes1.find(
+      repcorrecte=>
+        repcorrecte.idQ===this.idQuest
+    )
+
+    if(item!.index==0){
       this.answerKey1='a';
       this.answerKey2='i';
     }
-    else if (keyNb==1){
+    else if (item!.index==1){
       this.answerKey1='z';
       this.answerKey2='o';
     }
-    else if (keyNb==2){
+    else if (item!.index==2){
       this.answerKey1='e';
       this.answerKey2='p';
     }
